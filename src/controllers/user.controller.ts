@@ -1,9 +1,20 @@
 import { Request, Response } from "express";
 import User from "../models/User";
 import bcrypt from "bcrypt";
+import jsonwebtoken from "jsonwebtoken";
 
-export const getUsers = (req: Request, res: Response): void => {
-  res.json({ message: "Get all users" });
+export const getUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await User.find({});
+    res.status(200).json({
+      // Use 200 for successful GET requests
+      message: "User data retrieved successfully!",
+      data: users,
+    });
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    res.status(500).json({ message: "Error retrieving user data" }); // Send an error response
+  }
 };
 
 export const postUser = async (req: Request, res: Response): Promise<void> => {
@@ -48,4 +59,29 @@ export const postUser = async (req: Request, res: Response): Promise<void> => {
     console.error("Error registering user:", error);
     res.status(500).json({ message: "Server Error" });
   }
+};
+
+export const loginUser = async (req: Request, res: Response): Promise<void> => {
+  const { email, password } = req.body;
+
+  const existingUser = await User.findOne({ email });
+
+  if (!existingUser) {
+    res.status(401).json({ message: "User not exists" });
+    return;
+  }
+  const matchPassword = await bcrypt.compare(password, existingUser.password);
+  if (!matchPassword) {
+    res.status(401).json({ message: "Invalid credentials" });
+    return;
+  }
+  const token = jsonwebtoken.sign(
+    { _id: existingUser._id },
+    "blog-secret-key-1",
+    { expiresIn: "1h" }
+  );
+  res.status(201).json({
+    message: "Login successfully",
+    data: token,
+  });
 };
