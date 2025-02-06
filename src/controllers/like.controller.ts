@@ -30,7 +30,17 @@ export const likePost = async (
     // Check if user already liked the post
     const existingLike = await Like.findOne({ user: userId, post: postId });
     if (existingLike) {
-      res.status(400).json({ message: "You already liked this post" });
+      const deletedLike = await Like.findByIdAndDelete(existingLike._id);
+
+      if (!deletedLike) {
+        res.status(404).json({ message: existingLike });
+        return;
+      }
+
+      res.status(200).json({ message: "You un liked this post" });
+
+      post.likes -= 1;
+      await post.save();
       return;
     }
 
