@@ -3,6 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
 import userRoutes from "./routes/user.routes";
+import postRoutes from "./routes/post.routes";
 import mongoose from "mongoose";
 
 dotenv.config();
@@ -25,5 +26,6 @@ app.use(express.urlencoded({ extended: true })); // for x-www-form-urlencoded an
 
 // Routes
 app.use("/api", userRoutes);
+app.use("/api", postRoutes);
 
 export default app;

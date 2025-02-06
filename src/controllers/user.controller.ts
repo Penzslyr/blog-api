@@ -80,8 +80,13 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     "blog-secret-key-1",
     { expiresIn: "1h" }
   );
-  res.status(201).json({
+  res.status(200).json({
     message: "Login successfully",
+    user: {
+      _id: existingUser._id,
+      email: existingUser.email,
+      username: existingUser.username,
+    },
     data: token,
   });
 };
