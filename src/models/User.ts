@@ -11,6 +11,7 @@ interface IUser extends Document {
   website?: string;
   password: string;
   profilePicture?: string;
+  headerPicture?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -58,6 +59,10 @@ const userSchema = new Schema<IUser>(
       trim: true,
     },
     profilePicture: {
+      type: String, // Store Cloudinary URL or file path
+      default: "",
+    },
+    headerPicture: {
       type: String, // Store Cloudinary URL or file path
       default: "",
     },

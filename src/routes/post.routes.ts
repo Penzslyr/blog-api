@@ -4,10 +4,12 @@ import { createPost, getAllPosts } from "../controllers/post.controller";
 import { getPostLikes, likePost } from "../controllers/like.controller";
 import { addComment, getPostComments } from "../controllers/comment.controller";
 
+import { uploadPost, cloudinary } from "../middleware/uploadPost";
+
 const router = Router();
 
 // Posts
-router.post("/posts", authenticate, createPost);
+router.post("/posts", authenticate, uploadPost.single("media"), createPost);
 router.get("/posts", getAllPosts);
 
 // Likes

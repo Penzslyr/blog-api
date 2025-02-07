@@ -28,7 +28,14 @@ export const postUser = async (req: Request, res: Response): Promise<void> => {
     location,
     website,
   } = req.body;
-  const profilePicture = req.file ? req.file.path : ""; // Get uploaded file URL
+
+  // Explicitly cast req.files as an object containing arrays of files
+  const files = req.files as
+    | { [fieldname: string]: Express.Multer.File[] }
+    | undefined;
+
+  const profilePicture = files?.["profilePicture"]?.[0]?.path || "";
+  const headerPicture = files?.["headerPicture"]?.[0]?.path || "";
 
   if (!username || !email || !password) {
     res
@@ -56,6 +63,7 @@ export const postUser = async (req: Request, res: Response): Promise<void> => {
       location: location || "",
       website: website || "",
       profilePicture, // Save uploaded profile picture URL
+      headerPicture,
     });
 
     await newUser.save();
@@ -71,6 +79,7 @@ export const postUser = async (req: Request, res: Response): Promise<void> => {
         location: newUser.location,
         website: newUser.website,
         profilePicture: newUser.profilePicture,
+        headerPicture: newUser.headerPicture,
         createdAt: newUser.createdAt,
         updatedAt: newUser.updatedAt,
       },

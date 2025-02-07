@@ -11,7 +11,9 @@ export const createPost = async (
     const { content } = req.body;
     const userId = (req as any).user; // Extract user from auth middleware
 
-    const post = new Post({ user: userId, content });
+    const media = req.file ? req.file.path : ""; // Get uploaded file URL
+
+    const post = new Post({ user: userId, content, media });
     await post.save();
 
     res.status(201).json({ message: "Post created", post });

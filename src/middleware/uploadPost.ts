@@ -16,7 +16,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: "profilePicture", // Correct property
+    folder: "post-picture", // Correct property
     format: async () => "png", // Ensure images are in PNG format
     public_id: (req, file) => file.originalname.split(".")[0], // Extract filename without extension
   } as {
@@ -26,6 +26,6 @@ const storage = new CloudinaryStorage({
   }, // Explicit typing
 });
 
-const upload = multer({ storage });
+const uploadPost = multer({ storage });
 
-export { upload, cloudinary };
+export { uploadPost, cloudinary };
