@@ -1,16 +1,21 @@
-import { Timestamp } from "./../../node_modules/bson/src/timestamp";
 import mongoose, { Schema, Document } from "mongoose";
 
-// define interface for user model
+// Define interface for user model
 interface IUser extends Document {
-  username: string;
   email: string;
+  username: string;
+  displayName?: string;
+  birthdate?: Date;
+  bio?: string;
+  location?: string;
+  website?: string;
   password: string;
+  profilePicture?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-// define use schema with timestamps on
+// Define user schema with timestamps
 const userSchema = new Schema<IUser>(
   {
     username: {
@@ -30,11 +35,37 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: true,
     },
+    displayName: {
+      type: String,
+      trim: true,
+    },
+    birthdate: {
+      type: Date,
+    },
+    bio: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    location: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    website: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    profilePicture: {
+      type: String, // Store Cloudinary URL or file path
+      default: "",
+    },
   },
-  { timestamps: true } // auto add createdAt and updateAt
+  { timestamps: true } // Automatically adds createdAt & updatedAt fields
 );
 
-//
+// Create User model
 const User = mongoose.model<IUser>("User", userSchema);
 
 export default User;

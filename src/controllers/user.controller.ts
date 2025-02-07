@@ -18,39 +18,59 @@ export const getUsers = async (req: Request, res: Response) => {
 };
 
 export const postUser = async (req: Request, res: Response): Promise<void> => {
-  const { username, email, password } = req.body;
+  const {
+    username,
+    email,
+    password,
+    displayName,
+    birthdate,
+    bio,
+    location,
+    website,
+  } = req.body;
+  const profilePicture = req.file ? req.file.path : ""; // Get uploaded file URL
 
   if (!username || !email || !password) {
-    res.status(400).json({ message: "All fields are required" });
+    res
+      .status(400)
+      .json({ message: "Username, email, and password are required" });
     return;
   }
 
   try {
-    // Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       res.status(400).json({ message: "User already exists" });
       return;
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10); // hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new user
     const newUser = new User({
       username,
       email,
       password: hashedPassword,
+      displayName: displayName || username,
+      birthdate: birthdate || null,
+      bio: bio || "",
+      location: location || "",
+      website: website || "",
+      profilePicture, // Save uploaded profile picture URL
     });
 
-    // Save the user to the database
     await newUser.save();
 
-    // Respond with the newly created user, including the timestamps
     res.status(201).json({
       message: "User registered successfully!",
       user: {
         username: newUser.username,
         email: newUser.email,
+        displayName: newUser.displayName,
+        birthdate: newUser.birthdate,
+        bio: newUser.bio,
+        location: newUser.location,
+        website: newUser.website,
+        profilePicture: newUser.profilePicture,
         createdAt: newUser.createdAt,
         updatedAt: newUser.updatedAt,
       },
