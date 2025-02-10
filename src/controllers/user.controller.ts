@@ -2,6 +2,12 @@ import { Request, Response } from "express";
 import User from "../models/User";
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
+import mongoose from "mongoose";
+
+// Define interface for authenticated requests
+interface AuthRequest extends Request {
+  user?: string;
+}
 
 export const getUsers = async (req: Request, res: Response) => {
   try {
@@ -118,4 +124,119 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     },
     data: token,
   });
+};
+
+export const followUser = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const userToFollow = await User.findById(req.params.id);
+    const currentUser = await User.findById(req.user); // req.user is the ID string
+
+    if (!userToFollow || !currentUser) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    // Check if already following
+    if (
+      currentUser.following.includes(
+        userToFollow._id as unknown as mongoose.Types.ObjectId
+      )
+    ) {
+      res.status(400).json({ message: "Already following this user" });
+      return;
+    }
+
+    // Add to following/followers
+    await User.findByIdAndUpdate(currentUser._id, {
+      $push: { following: userToFollow._id },
+    });
+
+    await User.findByIdAndUpdate(userToFollow._id, {
+      $push: { followers: currentUser._id },
+    });
+
+    res.status(200).json({
+      message: "Successfully followed user",
+      followedUser: userToFollow.username,
+    });
+  } catch (error) {
+    console.error("Error following user:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+export const unfollowUser = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const userToUnfollow = await User.findById(req.params.id);
+    const currentUser = await User.findById(req.user); // req.user is the ID string
+
+    if (!userToUnfollow || !currentUser) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    // Check if not following
+    if (
+      !currentUser.following.includes(
+        userToUnfollow._id as unknown as mongoose.Types.ObjectId
+      )
+    ) {
+      res.status(400).json({ message: "Not following this user" });
+      return;
+    }
+
+    // Remove from following/followers
+    await User.findByIdAndUpdate(currentUser._id, {
+      $pull: { following: userToUnfollow._id },
+    });
+
+    await User.findByIdAndUpdate(userToUnfollow._id, {
+      $pull: { followers: currentUser._id },
+    });
+
+    res.status(200).json({
+      message: "Successfully unfollowed user",
+      unfollowedUser: userToUnfollow.username,
+    });
+  } catch (error) {
+    console.error("Error unfollowing user:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// Helper function to get followers/following count and list
+export const getUserFollowStats = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const user = await User.findById(req.params.id)
+      .populate("followers", "username displayName profilePicture")
+      .populate("following", "username displayName profilePicture");
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    res.status(200).json({
+      followers: {
+        count: user.followers.length,
+        list: user.followers,
+      },
+      following: {
+        count: user.following.length,
+        list: user.following,
+      },
+    });
+  } catch (error) {
+    console.error("Error getting follow stats:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
 };

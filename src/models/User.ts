@@ -12,6 +12,8 @@ interface IUser extends Document {
   password: string;
   profilePicture?: string;
   headerPicture?: string;
+  followers: mongoose.Types.ObjectId[];
+  following: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -66,6 +68,18 @@ const userSchema = new Schema<IUser>(
       type: String, // Store Cloudinary URL or file path
       default: "",
     },
+    followers: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    following: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true } // Automatically adds createdAt & updatedAt fields
 );
