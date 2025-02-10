@@ -18,7 +18,10 @@ const storage = new CloudinaryStorage({
   params: {
     folder: "post-picture", // Correct property
     format: async () => "png", // Ensure images are in PNG format
-    public_id: (req, file) => file.originalname.split(".")[0], // Extract filename without extension
+    public_id: (req: any, file: any) => {
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      return `${uniqueSuffix}-${file.originalname.split(".")[0]}`;
+    },
   } as {
     folder: string;
     format: () => Promise<string>;
