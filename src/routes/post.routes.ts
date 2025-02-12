@@ -4,6 +4,8 @@ import {
   createPost,
   getAllPosts,
   deletePost,
+  retweetPost,
+  quotePost,
 } from "../controllers/post.controller";
 import { getPostLikes, likePost } from "../controllers/like.controller";
 import { addComment, getPostComments } from "../controllers/comment.controller";
@@ -14,6 +16,13 @@ const router = Router();
 
 // Posts
 router.post("/posts", authenticate, uploadPost.single("media"), createPost);
+router.post("/posts/:id/retweet", authenticate, retweetPost);
+router.post(
+  "/posts/:id/quote",
+  authenticate,
+  uploadPost.single("media"),
+  quotePost
+);
 router.get("/posts", getAllPosts);
 router.delete("/posts/:id", authenticate, deletePost);
 

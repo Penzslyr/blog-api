@@ -4,6 +4,90 @@ import Like from "../models/Like";
 import Comment from "../models/Comment";
 import { cloudinary } from "../middleware/uploadPost";
 
+export const retweetPost = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const postId = req.params.id;
+    const userId = (req as any).user;
+    console.log(userId, postId);
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      res.status(404).json({ message: "Post not found" });
+      return;
+    }
+
+    // Check if the user has already retweeted this post
+    const existingRetweet = await Post.findOne({ user: userId, post: postId });
+    if (existingRetweet) {
+      // Delete the existing retweet
+      await existingRetweet.deleteOne();
+      res.status(200).json({ message: "Post unretweeted" });
+      console.log("Existing retweet deleted");
+      return;
+    }
+
+    // Create a new retweet
+    const retweet = new Post({
+      user: userId,
+      post: postId,
+    });
+
+    await retweet.save();
+    res.status(201).json({ message: "Post retweeted", retweet });
+  } catch (error) {
+    console.error("Error in retweetPost:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const quotePost = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = (req as any).user;
+    const postId = req.params.id;
+    const { content } = req.body;
+
+    let media = "";
+    let mediaPublicId = "";
+
+    if (req.file) {
+      media = req.file.path;
+      // Extract public_id from Cloudinary response
+      mediaPublicId = req.file.filename || "";
+    }
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      res.status(404).json({ message: "Post not found" });
+      return;
+    }
+
+    // Check if the user has already quote this post
+    const existingRetweet = await Post.findOne({ user: userId, post: postId });
+    if (existingRetweet) {
+      res.status(200).json({ message: "You have already quoted this post" });
+      console.log("Existing retweet deleted");
+      return;
+    }
+
+    const quote = new Post({
+      user: userId,
+      post: postId,
+      content,
+      media,
+      mediaPublicId,
+    });
+
+    await quote.save();
+    res.status(201).json({ message: "Post quoted", quote });
+  } catch (error) {
+    console.error("Error in quotePost:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export const createPost = async (
   req: Request,
   res: Response
