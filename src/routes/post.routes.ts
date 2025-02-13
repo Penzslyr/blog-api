@@ -6,6 +6,7 @@ import {
   deletePost,
   retweetPost,
   quotePost,
+  bookmarkPost,
 } from "../controllers/post.controller";
 import { getPostLikes, likePost } from "../controllers/like.controller";
 import { addComment, getPostComments } from "../controllers/comment.controller";
@@ -23,6 +24,7 @@ router.post(
   uploadPost.single("media"),
   quotePost
 );
+router.post("/posts/:id/bookmark", authenticate, bookmarkPost);
 router.get("/posts", getAllPosts);
 router.delete("/posts/:id", authenticate, deletePost);
 

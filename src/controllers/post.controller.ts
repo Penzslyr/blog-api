@@ -183,3 +183,37 @@ export const deletePost = async (
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const bookmarkPost = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const postId = req.params.id;
+    const userId = (req as any).user;
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      res.status(404).json({ message: "Post not found" });
+      return;
+    }
+
+    // Check if the post is already bookmarked
+    // If it is, remove the user from the bookmarks array
+    // If it is not, add the user to the bookmarks array
+    if (post.bookmarks.includes(userId)) {
+      post.bookmarks = post.bookmarks.filter(
+        (id) => id.toString() !== userId.toString()
+      );
+      await post.save();
+      res.status(200).json({ message: "Post unbookmarked", post });
+    } else {
+      post.bookmarks.push(userId);
+      await post.save();
+      res.status(200).json({ message: "Post bookmarked", post });
+    }
+  } catch (error) {
+    console.error("Error in bookmarkPost:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

@@ -7,7 +7,8 @@ export interface IPost extends Document {
   media?: string;
   mediaPublicId?: string;
   likes: number; // Count, not embedded data
-  comments: number; // Count, not embedded data
+  comments: number; // Count, not embedded data\
+  bookmarks: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,6 +22,7 @@ const PostSchema = new Schema<IPost>(
     mediaPublicId: { type: String },
     likes: { type: Number, default: 0 },
     comments: { type: Number, default: 0 },
+    bookmarks: { type: [Schema.Types.ObjectId], ref: "User", default: [] },
   },
   { timestamps: true }
 );
