@@ -7,6 +7,7 @@ import {
   retweetPost,
   quotePost,
   bookmarkPost,
+  getBookmarkedPosts,
 } from "../controllers/post.controller";
 import { getPostLikes, likePost } from "../controllers/like.controller";
 import { addComment, getPostComments } from "../controllers/comment.controller";
@@ -26,6 +27,7 @@ router.post(
 );
 router.post("/posts/:id/bookmark", authenticate, bookmarkPost);
 router.get("/posts", getAllPosts);
+router.get("/posts/bookmarked", authenticate, getBookmarkedPosts);
 router.delete("/posts/:id", authenticate, deletePost);
 
 // Likes

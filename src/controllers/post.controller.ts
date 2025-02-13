@@ -135,6 +135,22 @@ export const getAllPosts = async (
   }
 };
 
+export const getBookmarkedPosts = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = (req as any).user;
+    const posts = await Post.find({ bookmarks: userId }).populate(
+      "user",
+      "email"
+    );
+    res.status(200).json(posts);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 /**
  * Deletes a post, its associated likes, comments, and media from Cloudinary
  * @param req Express request object containing post ID and authenticated user
