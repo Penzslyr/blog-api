@@ -14,8 +14,6 @@ export const createMessage = async (
     const sender = (req as any).user;
     const { receiver, content } = req.body;
 
-    console.log(receiver, content, sender);
-
     if (!receiver || !content) {
       res.status(400).json({ message: "Receiver and content are required" });
       return;
