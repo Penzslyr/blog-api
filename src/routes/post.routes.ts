@@ -13,6 +13,7 @@ import { getPostLikes, likePost } from "../controllers/like.controller";
 import { addComment, getPostComments } from "../controllers/comment.controller";
 
 import { uploadPost, cloudinary } from "../middleware/uploadPost";
+import { createMessage, getMessages } from "../controllers/message.controller";
 
 const router = Router();
 
@@ -38,3 +39,7 @@ router.get("/posts/:postId/likes", getPostLikes);
 router.post("/posts/:postId/comment", authenticate, addComment);
 router.get("/posts/:postId/comments", getPostComments);
 export default router;
+
+// Messages
+router.post("/messages", authenticate, createMessage);
+router.get("/messages/:userId", authenticate, getMessages);

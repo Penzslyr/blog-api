@@ -19,10 +19,9 @@ mongoose
 
 // Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // for x-www-form-urlencoded and form-data. Middleware to parse URL-encoded data and form-data
 app.use(cors());
 app.use(morgan("dev"));
-
-app.use(express.urlencoded({ extended: true })); // for x-www-form-urlencoded and form-data. Middleware to parse URL-encoded data and form-data
 
 // Routes
 app.use("/api", userRoutes);
